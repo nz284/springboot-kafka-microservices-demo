@@ -1,6 +1,6 @@
 """Run after docker compose up. Python standard library only; fails on timeout."""
-import json,time,uuid,urllib.request,urllib.error,argparse
-p=argparse.ArgumentParser();p.add_argument("--core-only",action="store_true");args=p.parse_args()
+import json,time,uuid,urllib.request,urllib.error,argparse,os
+p=argparse.ArgumentParser();p.add_argument("--core-only",action="store_true");p.add_argument('--grafana-url',default='http://localhost:'+os.environ.get('GRAFANA_PORT','3000'));args=p.parse_args()
 def request(url,data=None):
  body=None if data is None else json.dumps(data).encode()
  with urllib.request.urlopen(urllib.request.Request(url,data=body,headers={'Content-Type':'application/json'}),timeout=5) as r:return json.load(r)
@@ -29,5 +29,5 @@ for port in [8080,8081]:
  with urllib.request.urlopen(f'http://localhost:{port}/actuator/prometheus') as r:assert b'jvm_memory_used_bytes' in r.read()
 if not args.core_only:
  wait(lambda:len([t for t in request('http://localhost:9090/api/v1/targets')['data']['activeTargets'] if t['health']=='up'])==2,60)
- with urllib.request.urlopen('http://localhost:3000/api/health') as r:assert r.status==200
+ with urllib.request.urlopen(args.grafana_url+'/api/health') as r:assert r.status==200
 print('PASS: confirmation, rejection, idempotency, conflict, validation, JVM metrics' + ('' if args.core_only else ', Prometheus and Grafana health'))

@@ -1,0 +1,6 @@
+{
+  "orderId": "e184f5ca-2ef7-49ff-9977-bffcc1e0ad39",
+  "during_outage": "PENDING",
+  "outbox_failures_observed": true,
+  "after_recovery": "CONFIRMED"
+}

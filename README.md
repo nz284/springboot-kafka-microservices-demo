@@ -46,6 +46,12 @@ python scripts/smoke.py
 
 停止：`docker compose down`。数据库及 Kafka 数据保存在命名卷。**`docker compose down -v` 会删除本项目订单、库存和 Kafka 数据**，仅在需要重置演示数据时使用。
 
+### Windows 端口被系统保留时
+
+如果 Grafana 启动报 3000 端口被拒绝，可运行 `netsh interface ipv4 show excludedportrange protocol=tcp` 检查。可在项目根目录 `.env` 写入 `GRAFANA_PORT=13000`，重新执行 `docker compose up -d --build`，然后访问 http://localhost:13000/d/microservices-demo 。完整检查使用 `python scripts/smoke.py --grafana-url http://localhost:13000`。无需修改 Windows 的端口保留规则。
+
+测试依赖使用 Testcontainers 1.21.4，兼容 Docker 29 的较新 API 要求。Windows 若需显式指定 Docker 后端，可在 PowerShell 设置 `$env:DOCKER_HOST='npipe:////./pipe/dockerDesktopLinuxEngine'` 后运行集成测试。
+
 ## API / curl 示例
 
 下列 curl 使用 Bash 语法。在 PowerShell 中可使用随附的 `scripts/demo.ps1`；Windows 上请使用 `curl.exe`，避免旧版 PowerShell 的同名别名。
@@ -117,6 +123,8 @@ docker compose start kafka
 5. 观察 JVM heap、process CPU 和 service up。无业务请求时 p95 可能无数据；计数器首次发生事件后才出现。指标不是测试覆盖率。
 
 包含 8 个面板：服务抓取状态、HTTP RPS、HTTP p95、订单结果、JVM heap、Outbox 发送失败、库存预留结果、CPU。业务计数器是进程内观测数据，重启归零，极少数事务回滚也可能已经计数；数据库是业务事实来源。
+
+![本机实际运行的 Grafana dashboard](docs/grafana-dashboard.jpg)
 
 ## 构建与测试
 

@@ -1,0 +1,42 @@
+[
+  {
+    "type": "surefire",
+    "name": "demo.OutboxTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "type": "surefire",
+    "name": "demo.InventoryTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "type": "surefire",
+    "name": "demo.OrdersTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "type": "failsafe",
+    "name": "demo.WorkflowIT",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "type": "failsafe",
+    "name": "demo.WorkflowIT",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  }
+]

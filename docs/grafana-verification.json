@@ -1,0 +1,38 @@
+{
+  "dashboard_uid": "microservices-demo",
+  "panel_count": 8,
+  "datasource_health": {
+    "details": {
+      "application": "Prometheus",
+      "features": {
+        "rulerApiEnabled": false
+      }
+    },
+    "message": "Successfully queried the Prometheus API.",
+    "status": "OK"
+  },
+  "service_targets": [
+    {
+      "metric": {
+        "__name__": "up",
+        "instance": "inventory-service:8081",
+        "job": "microservices"
+      },
+      "value": [
+        1792942155.483,
+        "1"
+      ]
+    },
+    {
+      "metric": {
+        "__name__": "up",
+        "instance": "order-service:8080",
+        "job": "microservices"
+      },
+      "value": [
+        1792942155.483,
+        "1"
+      ]
+    }
+  ]
+}
