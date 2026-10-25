@@ -26,7 +26,9 @@ Windows 本机的 3000 端口位于系统保留范围 2993–3092，故仅在被
 
 [首次 Verify 运行成功](https://github.com/nz284/springboot-kafka-microservices-demo/actions/runs/40203673514)，对应提交 `98a21fb8e27182c225d6a48368080443b9e8894f`。
 
-已从 GitHub Actions jobs 和日志核实：10 单元测试 + 5 Testcontainers 测试通过；Compose 配置、镜像构建/启动、完整 smoke（含监控健康）均成功。该运行不是本机 Docker 验证；后续兼容性补丁提交的 CI 会单独核实并记录。
+已从 GitHub Actions jobs 和日志核实：10 单元测试 + 5 Testcontainers 测试通过；Compose 配置、镜像构建/启动、完整 smoke（含监控健康）均成功。该运行不是本机 Docker 验证。
+
+[兼容性补丁的最新 Verify 运行也已成功](https://github.com/nz284/springboot-kafka-microservices-demo/actions/runs/40207504892)，对应代码提交 `3970a8b71208db3cbca4a8519d76f8d34a88f595`。Testcontainers 1.21.4 的 15 个测试、Compose 构建启动及完整监控 smoke 均成功。其后仅补记本文档，因此文档提交使用 skip ci 标记，未将未经测试的代码视为通过。
 
 ## 此前原生验证（保留历史证据）
 
