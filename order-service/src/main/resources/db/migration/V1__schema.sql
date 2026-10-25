@@ -1,0 +1,2 @@
+create table outbox(id uuid primary key,topic varchar(100) not null,event_key varchar(100) not null,payload text not null,created_at timestamptz not null default now());
+create table orders(id uuid primary key,sku varchar(64) not null,quantity integer not null check(quantity between 1 and 1000),status varchar(20) not null check(status in ('PENDING','CONFIRMED','REJECTED')),created_at timestamptz not null default now());

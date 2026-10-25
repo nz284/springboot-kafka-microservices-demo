@@ -1,0 +1,12 @@
+{
+  "concurrent_orders": 60,
+  "concurrency": 10,
+  "initial_stock": 99,
+  "confirmed": 49,
+  "rejected": 11,
+  "final_stock": 1,
+  "malformed_event_dlt": "PASS",
+  "transaction_rollback": "PASS",
+  "transient_retry_exhausted_dlt": "PASS",
+  "manual_replay_after_repair": "PASS"
+}
