@@ -1,5 +1,7 @@
 **/target
 .git
+.idea
 *.zip
 work
 outputs
+.env

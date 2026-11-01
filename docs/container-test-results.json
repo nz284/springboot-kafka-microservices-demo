@@ -1,13 +1,6 @@
 [
   {
-    "type": "surefire",
-    "name": "demo.OutboxTest",
-    "tests": "2",
-    "failures": "0",
-    "errors": "0",
-    "skipped": "0"
-  },
-  {
+    "module": "inventory-service",
     "type": "surefire",
     "name": "demo.InventoryTest",
     "tests": "4",
@@ -16,14 +9,34 @@
     "skipped": "0"
   },
   {
+    "module": "inventory-service",
+    "type": "surefire",
+    "name": "demo.OutboxTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "module": "order-service",
+    "type": "surefire",
+    "name": "demo.CassandraOutboxRelayTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "module": "order-service",
     "type": "surefire",
     "name": "demo.OrdersTest",
-    "tests": "4",
+    "tests": "7",
     "failures": "0",
     "errors": "0",
     "skipped": "0"
   },
   {
+    "module": "inventory-service",
     "type": "failsafe",
     "name": "demo.WorkflowIT",
     "tests": "4",
@@ -32,9 +45,10 @@
     "skipped": "0"
   },
   {
+    "module": "order-service",
     "type": "failsafe",
     "name": "demo.WorkflowIT",
-    "tests": "1",
+    "tests": "5",
     "failures": "0",
     "errors": "0",
     "skipped": "0"

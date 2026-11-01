@@ -47,16 +47,6 @@ public class Outbox {
     }
   }
 
-  public static Event decode(ObjectMapper json, String payload) {
-    try {
-      Event e = json.readValue(payload, Event.class);
-      e.validate();
-      return e;
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid event payload", e);
-    }
-  }
-
   @Scheduled(fixedDelayString = "${demo.outbox.delay:1000}")
   public void publish() {
     try {

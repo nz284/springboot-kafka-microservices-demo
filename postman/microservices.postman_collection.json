@@ -1,0 +1,364 @@
+{
+  "info": {
+    "name": "Cassandra Order + PostgreSQL Inventory Demo",
+    "description": "Start Compose first. Run with 1000ms request delay. Consumes one DEMO-SKU unit; keep other clients idle for exact stock assertions.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "orderBaseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "inventoryBaseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "rejectedOrderId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Order health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{orderBaseUrl}}/actuator/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Order healthy\",()=>pm.expect(pm.response.json().status).to.eql(\"UP\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventory health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{inventoryBaseUrl}}/actuator/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock before order",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{inventoryBaseUrl}}/api/inventory/DEMO-SKU"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const stock=pm.response.json().available;",
+              "pm.test(\"Sample stock available\",()=>pm.expect(stock).to.be.at.least(1));",
+              "pm.collectionVariables.set(\"initialStock\",String(stock));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{orderBaseUrl}}/api/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"sku\": \"DEMO-SKU\",\n  \"quantity\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"orderId\",pm.variables.replaceIn(\"{{$guid}}\"));",
+              "pm.collectionVariables.set(\"orderPolls\",\"0\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", function () { pm.response.to.have.status(202); });",
+              "pm.test(\"Returned same ID\",()=>pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"orderId\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wait for order result",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{orderBaseUrl}}/api/orders/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const state=pm.response.json().status;",
+              "const attempts=Number(pm.collectionVariables.get(\"orderPolls\")||0)+1;",
+              "pm.collectionVariables.set(\"orderPolls\",String(attempts));",
+              "pm.test(\"Valid order state\",()=>pm.expect([\"PENDING\",\"CONFIRMED\"]).to.include(state));",
+              "if(state===\"PENDING\" && attempts<60){pm.execution.setNextRequest(\"Wait for order result\");}",
+              "else{pm.test(\"Order reaches CONFIRMED\",()=>pm.expect(state).to.eql(\"CONFIRMED\"));}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Replay identical order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{orderBaseUrl}}/api/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"sku\": \"DEMO-SKU\",\n  \"quantity\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", function () { pm.response.to.have.status(202); });",
+              "pm.test(\"Existing order stays confirmed\",()=>pm.expect(pm.response.json().status).to.eql(\"CONFIRMED\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock after replay",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{inventoryBaseUrl}}/api/inventory/DEMO-SKU"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Only one unit deducted\",()=>pm.expect(pm.response.json().available).to.eql(Number(pm.collectionVariables.get(\"initialStock\"))-1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conflicting payload",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{orderBaseUrl}}/api/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"sku\": \"DEMO-SKU\",\n  \"quantity\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create rejected order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{orderBaseUrl}}/api/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{rejectedOrderId}}\",\n  \"sku\": \"MISSING-SKU\",\n  \"quantity\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"rejectedOrderId\",pm.variables.replaceIn(\"{{$guid}}\"));",
+              "pm.collectionVariables.set(\"rejectionPolls\",\"0\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 202\", function () { pm.response.to.have.status(202); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wait for rejection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{orderBaseUrl}}/api/orders/{{rejectedOrderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const state=pm.response.json().status;",
+              "const attempts=Number(pm.collectionVariables.get(\"rejectionPolls\")||0)+1;",
+              "pm.collectionVariables.set(\"rejectionPolls\",String(attempts));",
+              "pm.test(\"Valid order state\",()=>pm.expect([\"PENDING\",\"REJECTED\"]).to.include(state));",
+              "if(state===\"PENDING\" && attempts<60){pm.execution.setNextRequest(\"Wait for rejection\");}",
+              "else{pm.test(\"Order reaches REJECTED\",()=>pm.expect(state).to.eql(\"REJECTED\"));}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid quantity",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{orderBaseUrl}}/api/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{$guid}}\",\n  \"sku\": \"DEMO-SKU\",\n  \"quantity\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unknown order",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{orderBaseUrl}}/api/orders/ffffffff-ffff-4fff-8fff-ffffffffffff"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

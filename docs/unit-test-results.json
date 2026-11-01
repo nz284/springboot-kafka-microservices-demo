@@ -1,12 +1,7 @@
 [
   {
-    "name": "demo.OutboxTest",
-    "tests": "2",
-    "failures": "0",
-    "errors": "0",
-    "skipped": "0"
-  },
-  {
+    "module": "inventory-service",
+    "type": "surefire",
     "name": "demo.InventoryTest",
     "tests": "4",
     "failures": "0",
@@ -14,8 +9,28 @@
     "skipped": "0"
   },
   {
+    "module": "inventory-service",
+    "type": "surefire",
+    "name": "demo.OutboxTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "module": "order-service",
+    "type": "surefire",
+    "name": "demo.CassandraOutboxRelayTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  {
+    "module": "order-service",
+    "type": "surefire",
     "name": "demo.OrdersTest",
-    "tests": "4",
+    "tests": "7",
     "failures": "0",
     "errors": "0",
     "skipped": "0"

@@ -22,14 +22,14 @@ public class OrderApi {
       @Min(1) @Max(1000) int quantity) {}
 
   @PostMapping
-  public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody Request r) {
+  public ResponseEntity<OrderRecord> create(@Valid @RequestBody Request r) {
     return ResponseEntity.accepted()
         .location(URI.create("/api/orders/" + r.orderId()))
         .body(orders.create(r.orderId(), r.sku(), r.quantity()));
   }
 
   @GetMapping("/{id}")
-  public Map<String, Object> get(@PathVariable UUID id) {
+  public OrderRecord get(@PathVariable UUID id) {
     return orders.get(id);
   }
 }

@@ -48,6 +48,6 @@ class OutboxTest {
   @Test
   void malformedEventIsRejected() {
     Assertions.assertThrows(
-        IllegalArgumentException.class, () -> Outbox.decode(new ObjectMapper(), "[]"));
+        IllegalArgumentException.class, () -> Events.decode(new ObjectMapper(), "[]"));
   }
 }

@@ -1,0 +1,27 @@
+{
+  "iterations": {
+    "total": 1,
+    "pending": 0,
+    "failed": 0
+  },
+  "requests": {
+    "total": 13,
+    "pending": 0,
+    "failed": 0
+  },
+  "assertions": {
+    "total": 23,
+    "pending": 0,
+    "failed": 0
+  },
+  "testScripts": {
+    "total": 13,
+    "pending": 0,
+    "failed": 0
+  },
+  "prerequestScripts": {
+    "total": 2,
+    "pending": 0,
+    "failed": 0
+  }
+}

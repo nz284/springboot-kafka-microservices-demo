@@ -24,7 +24,7 @@ public class Inventory {
   @KafkaListener(topics = Messaging.REQUESTS)
   @Transactional
   public void reserve(String payload) {
-    Event e = Outbox.decode(json, payload);
+    Event e = Events.decode(json, payload);
     if (!"PENDING".equals(e.status())) throw new IllegalArgumentException("Invalid status");
     // Unique constraint serializes duplicates; marker rolls back if later work fails.
     int first =

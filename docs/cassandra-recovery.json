@@ -1,0 +1,12 @@
+{
+  "orderId": "22a88d36-1ccf-468b-aa30-24a3e9d3f548",
+  "shard": 6,
+  "database": "Cassandra",
+  "during_outage": "PENDING",
+  "event_row_retained": true,
+  "failure_counter_increased": true,
+  "after_recovery": "CONFIRMED",
+  "event_row_removed_after_ack": true,
+  "retry_does_not_recreate_event": true,
+  "stock_deducted_once": true
+}
